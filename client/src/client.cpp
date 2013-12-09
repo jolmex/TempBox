@@ -33,7 +33,14 @@ int main() {
 
 	Tempbox* box = new Tempbox(2, 2, ip);
 
-	cout<<(box->getTemp(0));
+	try
+	{
+		cout<<(box->getTemp(0));
+	}catch(char const*)
+	{
+		printf("It's a fail!!!! Oh no.... :((\n");
+	}
+
 	cout<<'\n';
 
 	return 0;

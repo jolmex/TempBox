@@ -30,7 +30,7 @@ class Tempbox
 	//vars
 	int ledCount, detectorCount;
 	long ipTempBox;
-	char buff[BUFF_SIZE];
+	unsigned char buff[BUFF_SIZE];
 
 	///////////////////////////////////////////////////////////////////////////
 	// functions
@@ -38,7 +38,7 @@ class Tempbox
 
 
 	// Returns response length of TempBox. Recomended response buffer size 1024;
-	int sendUdp(char* comm, char* resp, char respSize);
+	int sendUdp(char* , char* , int );
 
 	long convertIp(char*);
 
