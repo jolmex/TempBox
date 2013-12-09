@@ -6,7 +6,7 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 #include <stdlib.h>
-#include <strstream>
+
 #include <string.h>
 #include <stddef.h>
 
@@ -15,7 +15,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <iostream>
 
 int bytesRead = 0;
 char buff[1024];
@@ -44,9 +43,16 @@ int main() {
 	ansver[1] = 0x01;
 	ansver[2] = 0x47;
 
-	bytesRead = recvfrom(sock, buff, 1024, 0, (struct sockaddr *)&addr_resp, NULL);
+	bytesRead = recvfrom(sock, buff, 1024, 0, NULL, NULL);
 
-	sendto(sock, "", 3, 0,(struct sockaddr *)&addr_resp, sizeof(addr_resp));
+	addr.sin_addr.s_addr = htonl(0xC0A80064);
+
+	unsigned char ans[6];
+	ans[0] = 0x55;
+	ans[1] = 0x02;
+	ans[2] = 0x29;
+
+	sendto(sock, ans, 6, 0,(struct sockaddr *)&addr, sizeof(addr));
 
 
 	close(sock);
