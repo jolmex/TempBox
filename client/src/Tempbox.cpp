@@ -55,29 +55,34 @@ long Tempbox::convertIp(char* addr)
 
 }
 
-int Tempbox::sendUdp(char* comm, char* resp, char respSize)
+int Tempbox::sendUdp(char* comm, char* resp, int respSize)
 {
 	int sock = socket(AF_INET, SOCK_DGRAM, 0);
-
 	struct sockaddr_in addrOut;
 		addrOut.sin_family = AF_INET;
 		addrOut.sin_port = htons(3424);
 		addrOut.sin_addr.s_addr = htonl(ipTempBox);
 
+	int sock_in = socket(AF_INET, SOCK_DGRAM, 0);
+	struct sockaddr_in addr;
+			addr.sin_family = AF_INET;
+			addr.sin_port = htons(3424);
+			addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
 	sendto(sock, comm, MESSAGE_SIZE, 0,(struct sockaddr *)&addrOut, sizeof(addrOut));
 
-	/*
 
-	if(bind(sock, (struct sockaddr *)&addrOut, sizeof(addrOut))<0)
+	if(bind(sock_in, (struct sockaddr *)&addr, sizeof(addr))<0)
 	{
 		close(sock);
 		perror("Socket perror");
 		throw; //There is thread exception error (thread object destructs before function itself)
 	}
-*/
-	int bytesRead = recvfrom(sock, resp, respSize, 0, NULL, NULL);
+
+	int bytesRead = recvfrom(sock_in, resp, respSize, 0, NULL, NULL);
 
 	close(sock);
+	close(sock_in);
 
 	return bytesRead;
 }
@@ -85,7 +90,6 @@ int Tempbox::sendUdp(char* comm, char* resp, char respSize)
 signed int Tempbox::sendCommand(int command, char value)
 {
 	int respLength = 0;
-	char buff[BUFF_SIZE];
 	char commLine[MESSAGE_SIZE];
 
 	switch(command)
@@ -116,7 +120,7 @@ signed int Tempbox::sendCommand(int command, char value)
 
 	try
 	{
-		respLength = sendUdp(commLine, buff, BUFF_SIZE);
+		respLength = sendUdp(commLine, (char*)buff, BUFF_SIZE);
 		if (respLength > 0)
 			return respLength;
 		else return -1;
