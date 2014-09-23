@@ -63,7 +63,7 @@ class Tempbox
 	double* getBothTemp(void);
 
 	// Set temp of conditioners
-	void setTemp(int temp);
+	char* setTemp(int temp);
 
 	// Send a command to device by num. Use Tempbox::Commands struct. Returns -1 == fail, 0 == not shure, 1 == success;
 	signed int sendCommand(int command, char value);

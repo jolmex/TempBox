@@ -58,31 +58,35 @@ long Tempbox::convertIp(char* addr)
 int Tempbox::sendUdp(char* comm, char* resp, int respSize)
 {
 	int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+	int on = 1;
+	setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) );
+
 	struct sockaddr_in addrOut;
 		addrOut.sin_family = AF_INET;
 		addrOut.sin_port = htons(3424);
-		addrOut.sin_addr.s_addr = htonl(ipTempBox);
+		addrOut.sin_addr.s_addr = htonl(ipTempBox);  // iptemp box
 
-	int sock_in = socket(AF_INET, SOCK_DGRAM, 0);
 	struct sockaddr_in addr;
 			addr.sin_family = AF_INET;
-			addr.sin_port = htons(3424);
+			addr.sin_port = htons(0);
 			addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+
+
+	if(bind(sock, (struct sockaddr *)&addr, sizeof(addr))<0)
+		{
+			close(sock);
+			perror("Socket perror");
+			throw; //There is thread exception error (thread object destructs before function itself)
+		}
 
 	sendto(sock, comm, MESSAGE_SIZE, 0,(struct sockaddr *)&addrOut, sizeof(addrOut));
 
-
-	if(bind(sock_in, (struct sockaddr *)&addr, sizeof(addr))<0)
-	{
-		close(sock);
-		perror("Socket perror");
-		throw; //There is thread exception error (thread object destructs before function itself)
-	}
-
-	int bytesRead = recvfrom(sock_in, resp, respSize, 0, NULL, NULL);
+	int bytesRead = recvfrom(sock, resp, respSize, 0, NULL, NULL);
 
 	close(sock);
-	close(sock_in);
+	//close(sock_in);
 
 	return bytesRead;
 }
@@ -133,7 +137,7 @@ signed int Tempbox::sendCommand(int command, char value)
 
 }
 
-void Tempbox::setTemp(int temp)
+char* Tempbox::setTemp(int temp)
 {
 	temp -=15; // temp is situated form 16 to 25 deg starting from 1 pos;
 	if((temp<1)||(temp>25)) throw "Temp is out of range";
@@ -142,11 +146,12 @@ void Tempbox::setTemp(int temp)
 	{
 		throw "Send error in setTemp";
 	}
+	return "Temp set successfully(maybe)\n";
 }
 
 double Tempbox::getTemp(int detectorNum)
 {
-	if((detectorNum>=detectorCount)) throw "Incorrect detector index";
+	if((detectorNum>=detectorCount)) throw "Incorrect detector index\n";
 
 	if( sendCommand(Commands::GetTemp, detectorNum) < 0)
 		{
