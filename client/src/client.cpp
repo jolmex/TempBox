@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 		{
 			try
 			{
-				cout<<(box->getTemp(*optarg-48))+'\n';
+				cout<<(box->getTemp(*optarg-48))<<"\n";
 
 			}catch(char const* str)
 			{
